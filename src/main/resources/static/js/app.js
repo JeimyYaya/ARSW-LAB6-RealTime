@@ -1,10 +1,31 @@
 var api = apiclient;
-
+var ws;
 var app = (function () {
     var author = "";
     var blueprints = [];
     var creatingNewBlueprint = false;
     var newBlueprintName = null;
+
+    function initWebSocket() {
+        ws = new WebSocket("ws://localhost:8080/ws/blueprints");
+
+        ws.onopen = function() {
+            console.log("WebSocket connected!");
+        }
+
+        ws.onmessage = function(evt) {
+            const point = JSON.parse(evt.data);
+            if (point.author && point.blueprintName) {
+                blueprintModule.addPointFromWS(point.x, point.y);
+            }
+        }
+
+        ws.onerror = function(err) {
+            console.error("WebSocket error:", err);
+        }
+    }
+
+
 
     var setAuthor = function (newAuthor) {
         author = newAuthor;
@@ -263,7 +284,8 @@ var app = (function () {
         drawBlueprint: drawBlueprint,
         saveCurrentBlueprint: saveCurrentBlueprint,
         createNewBlueprint: createNewBlueprint,
-        deleteCurrentBlueprint: deleteCurrentBlueprint
+        deleteCurrentBlueprint: deleteCurrentBlueprint,
+        initWebSocket: initWebSocket
     };
 
 })();

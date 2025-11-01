@@ -34,18 +34,21 @@ var blueprintModule = (function () {
   var onPointAdded = null;
 
   function addPoint(x, y) {
-    if (!currentBlueprint) {
-      console.log("No blueprint selected. Please select a blueprint first.");
-      return;
-    }
-    // Add point only in memory (not in the API)
-    currentBlueprint.points.push({ x: x, y: y });
-    // Repaint the canvas with the new point
+    if (!currentBlueprint) return;
+
+    currentBlueprint.points.push({x, y});
     repaint();
-    
-    // Notify the app about the point update
-    if (onPointAdded && currentBlueprint) {
-      onPointAdded(currentBlueprint.name, currentBlueprint.points.length);
+
+    if (onPointAdded) onPointAdded(currentBlueprint.name, currentBlueprint.points.length);
+
+    // enviar al WS
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            author: currentBlueprint.author,
+            blueprintName: currentBlueprint.name,
+            x: x,
+            y: y
+        }));
     }
   }
 

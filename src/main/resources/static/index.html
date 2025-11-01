@@ -128,6 +128,11 @@
             $("#deleteButton").click(function() {
                 app.deleteCurrentBlueprint();
             });
+            if (app.initWebSocket) {
+                app.initWebSocket();
+            } else {
+                console.error("initWebSocket no está definido en app");
+            }
         });
     </script>
 
